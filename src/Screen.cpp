@@ -105,6 +105,7 @@ namespace ps {
 
 
     void Screen::update() {
+
         // Updates the texture containing the pixel data.
         SDL_UpdateTexture(
             m_texture,                      // Texture to be updated.
@@ -127,6 +128,11 @@ namespace ps {
 
 
     void Screen::load_swarm(Swarm &swarm) {
+
+        for (int i=0; i< SCREEN_HEIGHT * SCREEN_WIDTH; ++i){
+            m_main_buffer[i]=0;
+        }
+
         // Load swarm particles.
         const Particle * const p_particles = swarm.get_particles();
 
@@ -139,6 +145,15 @@ namespace ps {
         // Load swarm with updated colors into main_buffer.
         for(int i = 0; i < Swarm::N_PARTICLES; ++i) {
             ps::Particle particle = p_particles[i];
+
+            if(particle.m_x_cord < -1 || particle.m_x_cord > 1 || particle.m_y_cord < -1 || particle.m_y_cord >1)
+                continue;
+
+            switch (particle.state){
+                case 0: red = 0; green=255;blue=0; break;
+                case 1: red = 0; green = 0; blue = 0; break;
+                default: red=255;green=0; blue=0; break;
+            }
             int x = static_cast<int>((particle.m_x_cord + 1) * SCREEN_WIDTH / 2);
             int y = static_cast<int>(particle.m_y_cord * SCREEN_WIDTH / 2 + SCREEN_HEIGHT/2);
             set_pixel_color(x, y, red, green, blue);
@@ -212,6 +227,11 @@ namespace ps {
         color += 0xFF;   // Alpha channel set to opaque
 
         m_main_buffer[x + (y * SCREEN_WIDTH)] = color;
+
+        if (x>0) m_main_buffer[(x-1) + (y * SCREEN_WIDTH)] = color;
+        if (x<SCREEN_WIDTH-2) m_main_buffer[(x+1) + (y * SCREEN_WIDTH)] = color;
+        if (y>0) m_main_buffer[x + ((y-1) * SCREEN_WIDTH)] = color;
+        if (y<SCREEN_HEIGHT-2) m_main_buffer[x + ((y+1) * SCREEN_WIDTH)] = color;
     }
 
 

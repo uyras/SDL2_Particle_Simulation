@@ -14,6 +14,8 @@ namespace ps {
         public:
             double m_x_cord;
             double m_y_cord;
+            unsigned char state; // 0 - unburned, 2,3,4,5,... - burn, 1 - burned
+            unsigned char temp_state;
 
         public:
             Particle();
